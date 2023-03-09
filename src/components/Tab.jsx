@@ -1,6 +1,8 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { useNavigate } from 'react-router-native';
 import Text from './Text';
+import { useAuthStorage } from '../hooks/useAuthStorage';
+import { useApolloClient } from '@apollo/client';
 
 const styles = StyleSheet.create({
   container: {
@@ -8,10 +10,16 @@ const styles = StyleSheet.create({
   },
 });
 
-const Tab = ({text, path}) => {
+const Tab = ({text, path, signout = false}) => {
   const navigate = useNavigate();
+  const authStorage = useAuthStorage();
+  const apolloClient = useApolloClient();
 
-  const onPressFunction = () => {
+  const onPressFunction = async () => {
+    if(signout) {
+      await authStorage.removeAccessToken();
+      apolloClient.resetStore();
+    }
     console.log('press');
     navigate(path)
   }
