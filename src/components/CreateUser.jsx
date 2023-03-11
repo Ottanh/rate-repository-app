@@ -1,11 +1,12 @@
 import { Formik } from 'formik';
-import SignInForm from './SignInForm';
 import { StyleSheet } from 'react-native';
 import * as yup from 'yup';
 import useSignIn from '../hooks/useSignIn';
 import { useAuthStorage } from '../hooks/useAuthStorage';
 import { useApolloClient } from '@apollo/client';
 import { useNavigate } from 'react-router-native';
+import CreateUserForm from './CreateUserForm';
+import useCreateUser from '../hooks/useCreateUser';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,17 +20,27 @@ const styles = StyleSheet.create({
 const validationSchema = yup.object().shape({ 
   username: yup    
    .string()     
-   .required('Username is required'),  
+   .required('Username is required')
+   .min(1, "Username too short")
+   .max(30, "Username too long"),  
   password: yup    
    .string()       
-   .required('Password is required'),}
+   .required('Password is required')
+   .min(5, "Password too short")
+   .max(50, "Password too long"),
+  confirm: yup    
+   .string()  
+   .oneOf([yup.ref('password'), null], "Passwords don't match")     
+   .required('Password confirmation is required')
+  }
 );
 
 
-export const SignInContainer = ({ onSubmit }) => {
+export const CreateUserContainer = ({ onSubmit }) => {
   const initialValues = {
     username: '',
     password: '',
+    confirmation: '',
   };
 
   return (
@@ -39,22 +50,25 @@ export const SignInContainer = ({ onSubmit }) => {
       style={styles.container}
       validationSchema={validationSchema}
     >
-      {({ handleSubmit }) => <SignInForm onSubmit={handleSubmit} />}
+      {({ handleSubmit }) => <CreateUserForm onSubmit={handleSubmit} />}
     </Formik>
   );
 }
 
 
-const SignIn = () => {
+const CreateUser = () => {
   const [signIn] = useSignIn();
+  const [createUser] = useCreateUser();
   const authStorage = useAuthStorage();
   const apolloClient = useApolloClient();
   const navigate = useNavigate();
   
   const onSubmit = async values => {
+    console.log(values)
     const { username, password } = values;
 
     try {
+      await createUser({ username, password });
       const { data } = await signIn({ username, password });
       const token = data.authenticate.accessToken;
       await authStorage.setAccessToken(token);
@@ -67,8 +81,8 @@ const SignIn = () => {
 
 
   return (
-    <SignInContainer onSubmit={onSubmit} />
+    <CreateUserContainer onSubmit={onSubmit} />
   );
 };
 
-export default SignIn;
+export default CreateUser;

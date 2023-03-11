@@ -54,10 +54,12 @@ const stylesTextInput = StyleSheet.create({
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
-      <FormikTextInput name="username" placeholder="Username" style={stylesTextInput}/>      
-      <FormikTextInput name="password" placeholder="Password" style={stylesTextInput} secureTextEntry={true} />      
+      <FormikTextInput name="owner" placeholder="Repository owner name" style={stylesTextInput}/>      
+      <FormikTextInput name="name" placeholder="Repository name" style={stylesTextInput} />
+      <FormikTextInput name="rating" placeholder="Rating bewteen 0 and 100" style={stylesTextInput}/>      
+      <FormikTextInput name="review" placeholder="Review" style={stylesTextInput} />       
       <Pressable onPress={onSubmit} style={styles.singInButton}>
-        <Text style={styles.signIntext}>Sign in</Text>
+        <Text style={styles.signIntext}>Create review</Text>
       </Pressable>
     </View>
   );

@@ -4,7 +4,7 @@ import { gql, useQuery } from '@apollo/client';
 import theme from '../theme';
 import Tab from './Tab';
 
-export const GET_USER = gql`
+const GET_USER = gql`
   query Me {
     me {
       id
@@ -26,17 +26,23 @@ const styles = StyleSheet.create({
 
 const AppBar = () => {
   const user = useQuery(GET_USER);
-  console.log(user.data)
 
   return (
     <View style={styles.container}>
       <ScrollView horizontal={true} style={styles.scrollview}>
         <Tab text="Repositories" path="/" />
         {!user?.data?.me && 
-          <Tab text="Sign in" path="/signin" />
+          <>
+            <Tab text="Sign in" path="/signin" />
+            <Tab text="Sign up" path="/signup" />
+          </>
         }
         {user?.data?.me && 
-          <Tab text="Sign out" signout={true} />
+          <>
+            <Tab text="Create review" path="/create-review" />
+            <Tab text="My reviews" path="/myreviews" />
+            <Tab text="Sign out" signout={true} />
+          </>
         }
       </ScrollView>
     </View>

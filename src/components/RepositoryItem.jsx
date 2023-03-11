@@ -1,11 +1,12 @@
-import { StyleSheet, View, Image } from 'react-native';
+import { StyleSheet, View, Image, Pressable } from 'react-native';
+import useRepository from '../hooks/useRepository';
 import theme from '../theme';
 import Text from './Text';
+import { openURL } from 'expo-linking';
 
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    flexShrink: 1,
     padding: 12,
     backgroundColor: 'white'
   },
@@ -35,14 +36,41 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRadius: 5,
     marginTop: 6
-  }
+  },
+  githubButton: {
+    flexGrow: 1,
+    flexShrink: 1,
+    padding: 12,
+    borderRadius: 5,
+    backgroundColor: theme.colors.primary,
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  githubText: {
+    fontWeight: 'bold',
+    color: 'white',
+    fontSize: theme.fontSizes.body
+  },
 });
 
 
 
-const RepositoryItem = ({ item }) => {
+const RepositoryItem = ({ id, button = false }) => {
+  const { data } = useRepository(id);
+
+  if(!data) {
+    return null;
+  }
+
+  const item = data.repository;
+
+  const openGithub = () => {
+    openURL(item.url);
+  }
+
+
   return (
-    <View style={styles.container}>
+    <View testID="repositoryItem" style={styles.container}>
       <View style={styles.header}>
         <Image
           style={styles.tinyAvatar}
@@ -56,7 +84,6 @@ const RepositoryItem = ({ item }) => {
           </View>
         </View>
       </View>
-
 
       <View style={styles.statsContainer}>
         <View >
@@ -77,6 +104,14 @@ const RepositoryItem = ({ item }) => {
           <Text>Rating</Text>
         </View>
       </View>
+
+      {button && 
+        <View style={styles.statsContainer}>
+        <Pressable onPress={openGithub} style={styles.githubButton}>
+          <Text style={styles.githubText}>Open in GitHub</Text>
+        </Pressable>
+        </View>
+      }
 
     </View>
   );
